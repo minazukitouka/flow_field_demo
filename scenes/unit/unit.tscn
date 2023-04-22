@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://bcis018n00vob"]
+
+[ext_resource type="Texture2D" uid="uid://dlioa4aegtmfy" path="res://scenes/unit/stop.png" id="1_u47kd"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_r8mqm"]
+radius = 7.0
+
+[node name="Unit" type="CharacterBody2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_r8mqm")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_u47kd")
