@@ -38,6 +38,8 @@ func draw_grid() -> void:
 		if cell.x > max_x: max_x = cell.x
 		if cell.y < min_y: min_y = cell.y
 		if cell.y > max_y: max_y = cell.y
+	max_x += 1
+	max_y += 1
 	for x in range(min_x, max_x):
 		draw_line(Vector2(x * 16, min_y * 16), Vector2(x * 16, max_y * 16), Color.DIM_GRAY)
 	for y in range(min_y, max_y):
@@ -57,9 +59,9 @@ func draw_integration_table() -> void:
 func draw_flow_table() -> void:
 	for cell in flow_table:
 		var from := Vector2(cell * 16) + Vector2(8, 8)
-		var to := Vector2(flow_table[cell] * 16) + Vector2(8, 8)
+		var to = from + flow_table[cell] * 8
 		draw_line(
 			from,
-			from.move_toward(to, 5),
+			to,
 			Color.BLUE
 		)

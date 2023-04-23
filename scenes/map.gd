@@ -43,7 +43,7 @@ func generate_cost_table() -> void:
 func generate_integration_table() -> void:
 	integration_table = {}
 	var destination_cell := Vector2i(destination / 16)
-	integration_table[destination_cell] = 0
+	integration_table[destination_cell] = 1
 
 	var visiting_cells := [destination_cell]
 
@@ -66,20 +66,44 @@ func generate_integration_table() -> void:
 
 func generate_flow_table() -> void:
 	flow_table = {}
+	var destination_cell := Vector2i(destination / 16)
 	for cell in integration_table:
-		var nearest_cell
-		var nearest_cost = integration_table[cell]
-		for neighbor in NEIGHBORS:
-			var neighbor_cell = cell + neighbor
-			if !integration_table.has(neighbor_cell):
-				continue
-			if integration_table[neighbor_cell] < nearest_cost:
-				nearest_cost = integration_table[neighbor_cell]
-				nearest_cell = neighbor_cell
-		if nearest_cell:
-			flow_table[cell] = nearest_cell
-
+		if cell == destination_cell:
+			continue
+		if is_any_neighbor_wall(cell):
+			flow_table[cell] = get_flow_by_minimum_distance(cell)
+		else:
+			flow_table[cell] = get_flow_by_convolution_kernel_gradient(cell)
 	debug_draw.flow_table = flow_table
+
+
+func is_any_neighbor_wall(cell: Vector2i) -> bool:
+	for neighbor in NEIGHBORS:
+		var neighbor_cell = cell + neighbor
+		if !integration_table.has(neighbor_cell):
+			return true
+	return false
+
+
+func get_flow_by_minimum_distance(cell: Vector2i) -> Vector2:
+	var direction := Vector2i.ZERO
+	var minimum_distance := 255
+	for neighbor in NEIGHBORS:
+		var neighbor_cell = cell + neighbor
+		if !integration_table.has(neighbor_cell):
+			continue
+		if integration_table[neighbor_cell] < minimum_distance:
+			direction = neighbor
+			minimum_distance = integration_table[neighbor_cell]
+	return Vector2(direction).normalized()
+
+
+func get_flow_by_convolution_kernel_gradient(cell: Vector2i) -> Vector2:
+	var flow := Vector2.ZERO
+	for neighbor in NEIGHBORS:
+		var neighbor_cell = cell + neighbor
+		flow += Vector2(neighbor) / integration_table[neighbor_cell]
+	return flow.normalized()
 
 
 func is_out_of_map(cell: Vector2i) -> bool:
